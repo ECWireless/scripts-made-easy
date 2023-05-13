@@ -8,10 +8,12 @@ const inter = Inter({ subsets: ['latin'] });
 export default function Home() {
   const [prompt, setPrompt] = useState<string>('');
   const [result, setResult] = useState<string>('');
+  const [isGenerating, setIsGenerating] = useState<boolean>(false);
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
+      setIsGenerating(true);
       const response = await fetch('/api/generate', {
         method: 'POST',
         headers: {
@@ -33,6 +35,8 @@ export default function Home() {
     } catch (error: any) {
       console.error(error);
       alert(error.message);
+    } finally {
+      setIsGenerating(false);
     }
   };
 
@@ -50,11 +54,15 @@ export default function Home() {
           <input
             type="text"
             name="prompt"
-            placeholder="Enter a script prompt"
+            placeholder="Enter a keyword"
             value={prompt}
             onChange={e => setPrompt(e.target.value)}
           />
-          <input type="submit" value="Generate script" />
+          <input
+            disabled={isGenerating}
+            type="submit"
+            value={isGenerating ? 'Generating...' : 'Generate script'}
+          />
         </form>
         <p>{result}</p>
       </main>
